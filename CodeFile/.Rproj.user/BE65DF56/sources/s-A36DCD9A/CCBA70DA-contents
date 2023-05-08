@@ -1,0 +1,45 @@
+# Load library
+
+install.packages("quantmod")
+library(quantmod)
+
+#fetch dataset from online by doing getsymbol function
+getSymbols("^GSPC", from=as.Date("2009-01-01"), to=as.Date("2020-12-31"), periodicity="daily")
+
+# display dataset
+View(GSPC)
+
+#create time series by fetching adj_value with time
+price_adj = GSPC$GSPC.Adjusted
+
+# display timeseries
+View(price_adj)
+
+# now, perfome log return logic
+# first we do difference. here we are able to doing difference because time series is daily basis.
+# difference series gives return value which is store in ret object
+ret = diff(log(price_adj))
+View(ret)
+
+# ret has NA value so we removw those values
+retn = ret[!is.na(ret)]
+View(retn)
+
+# generate plot for more easly understand trend
+title = "S&P 500: Return Value"
+plot(retn, main = title, lty = "solid")
+
+summary(retn)
+# as per summary max is almost 0.1 as well as mean is 0 and min is negative value
+
+#now we have to find p value using ADF test
+# first we need to load tseries library
+
+install.packages("tseries")
+library(tseries)
+adf.test(retn)
+
+# p = 0.1 so alternative hypo is stationary
+
+acf(retn)
+pacf(retn)
